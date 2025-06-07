@@ -34,6 +34,7 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/pbar1/pkill-go"
 )
 
 // File Watcher struct.
@@ -63,12 +64,28 @@ type WatchFunc func(filename string, fw *FW)
 
 var fws = []FW{
 	{
+		directories: []string{"./main"},
+		// files:       []string{"main.go"},
+		regexMatch: ".go$",
+		ticker:     time.NewTicker(time.Second),
+		signal:     make(chan struct{}),
+		run:        GoWatch(),
+	},
+	{
+		directories: []string{"./main"},
+		regexMatch:  ".html$",
+		ticker:      time.NewTicker(time.Millisecond),
+		run: func(filename string, fw *FW) {
+			RunCmd(exec.Command("make", "qtc"), true)
+		},
+	},
+	{
 		directories: []string{"./"},
-		files:       []string{"main.go"},
-		regexMatch:  ".go$",
-		ticker:      time.NewTicker(time.Second),
-		signal:      make(chan struct{}),
-		run:         GoWatch(),
+		regexMatch:  ".sql$",
+		ticker:      time.NewTicker(time.Millisecond),
+		run: func(filename string, fw *FW) {
+			RunCmd(exec.Command("make", "sqlc"), true)
+		},
 	},
 }
 
@@ -94,12 +111,13 @@ func GoWatch() WatchFunc {
 				for {
 					<-fw.signal
 
-					// _, err := pkill.Pkill("main", os.Kill)
-					// if err != nil {
-					// 	log.Println(err)
-					// }
+					// first filename in alphabetic order
+					_, err := pkill.Pkill("api", os.Kill)
+					if err != nil {
+						log.Println(err)
+					}
 
-					cmd := exec.Command("go", "run", "main.go")
+					cmd := exec.Command("make", "run")
 					go RunCmd(cmd, true)
 				}
 			},
@@ -202,31 +220,31 @@ func AddDir(dir string, watcher *fsnotify.Watcher) error {
 	return nil
 }
 `)
-//line cmd/fw.qtpl:182
+//line cmd/fw.qtpl:200
 }
 
-//line cmd/fw.qtpl:182
+//line cmd/fw.qtpl:200
 func WriteFwTemplate(qq422016 qtio422016.Writer) {
-//line cmd/fw.qtpl:182
+//line cmd/fw.qtpl:200
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line cmd/fw.qtpl:182
+//line cmd/fw.qtpl:200
 	StreamFwTemplate(qw422016)
-//line cmd/fw.qtpl:182
+//line cmd/fw.qtpl:200
 	qt422016.ReleaseWriter(qw422016)
-//line cmd/fw.qtpl:182
+//line cmd/fw.qtpl:200
 }
 
-//line cmd/fw.qtpl:182
+//line cmd/fw.qtpl:200
 func FwTemplate() string {
-//line cmd/fw.qtpl:182
+//line cmd/fw.qtpl:200
 	qb422016 := qt422016.AcquireByteBuffer()
-//line cmd/fw.qtpl:182
+//line cmd/fw.qtpl:200
 	WriteFwTemplate(qb422016)
-//line cmd/fw.qtpl:182
+//line cmd/fw.qtpl:200
 	qs422016 := string(qb422016.B)
-//line cmd/fw.qtpl:182
+//line cmd/fw.qtpl:200
 	qt422016.ReleaseByteBuffer(qb422016)
-//line cmd/fw.qtpl:182
+//line cmd/fw.qtpl:200
 	return qs422016
-//line cmd/fw.qtpl:182
+//line cmd/fw.qtpl:200
 }

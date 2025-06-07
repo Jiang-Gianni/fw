@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/pbar1/pkill-go"
 )
 
 // File Watcher struct.
@@ -41,12 +42,28 @@ type WatchFunc func(filename string, fw *FW)
 
 var fws = []FW{
 	{
+		directories: []string{"./main"},
+		// files:       []string{"main.go"},
+		regexMatch: ".go$",
+		ticker:     time.NewTicker(time.Second),
+		signal:     make(chan struct{}),
+		run:        GoWatch(),
+	},
+	{
+		directories: []string{"./main"},
+		regexMatch:  ".html$",
+		ticker:      time.NewTicker(time.Millisecond),
+		run: func(filename string, fw *FW) {
+			RunCmd(exec.Command("make", "qtc"), true)
+		},
+	},
+	{
 		directories: []string{"./"},
-		files:       []string{"main.go"},
-		regexMatch:  ".go$",
-		ticker:      time.NewTicker(time.Second),
-		signal:      make(chan struct{}),
-		run:         GoWatch(),
+		regexMatch:  ".sql$",
+		ticker:      time.NewTicker(time.Millisecond),
+		run: func(filename string, fw *FW) {
+			RunCmd(exec.Command("make", "sqlc"), true)
+		},
 	},
 }
 
@@ -72,12 +89,13 @@ func GoWatch() WatchFunc {
 				for {
 					<-fw.signal
 
-					// _, err := pkill.Pkill("main", os.Kill)
-					// if err != nil {
-					// 	log.Println(err)
-					// }
+					// first filename in alphabetic order
+					_, err := pkill.Pkill("api", os.Kill)
+					if err != nil {
+						log.Println(err)
+					}
 
-					cmd := exec.Command("go", "run", "main.go")
+					cmd := exec.Command("make", "run")
 					go RunCmd(cmd, true)
 				}
 			},
