@@ -72,9 +72,8 @@ func main() {
 		go Watch(fw)
 	}
 
-	var block chan struct{}
-
-	<-block
+	// block forever
+	<-make(chan struct{})
 }
 
 // Function to run on go files updates.

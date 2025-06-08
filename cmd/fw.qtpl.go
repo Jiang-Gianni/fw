@@ -94,9 +94,8 @@ func main() {
 		go Watch(fw)
 	}
 
-	var block chan struct{}
-
-	<-block
+	// block forever
+	<-make(chan struct{})
 }
 
 // Function to run on go files updates.
@@ -220,31 +219,31 @@ func AddDir(dir string, watcher *fsnotify.Watcher) error {
 	return nil
 }
 `)
-//line cmd/fw.qtpl:200
+//line cmd/fw.qtpl:199
 }
 
-//line cmd/fw.qtpl:200
+//line cmd/fw.qtpl:199
 func WriteFwTemplate(qq422016 qtio422016.Writer) {
-//line cmd/fw.qtpl:200
+//line cmd/fw.qtpl:199
 	qw422016 := qt422016.AcquireWriter(qq422016)
-//line cmd/fw.qtpl:200
+//line cmd/fw.qtpl:199
 	StreamFwTemplate(qw422016)
-//line cmd/fw.qtpl:200
+//line cmd/fw.qtpl:199
 	qt422016.ReleaseWriter(qw422016)
-//line cmd/fw.qtpl:200
+//line cmd/fw.qtpl:199
 }
 
-//line cmd/fw.qtpl:200
+//line cmd/fw.qtpl:199
 func FwTemplate() string {
-//line cmd/fw.qtpl:200
+//line cmd/fw.qtpl:199
 	qb422016 := qt422016.AcquireByteBuffer()
-//line cmd/fw.qtpl:200
+//line cmd/fw.qtpl:199
 	WriteFwTemplate(qb422016)
-//line cmd/fw.qtpl:200
+//line cmd/fw.qtpl:199
 	qs422016 := string(qb422016.B)
-//line cmd/fw.qtpl:200
+//line cmd/fw.qtpl:199
 	qt422016.ReleaseByteBuffer(qb422016)
-//line cmd/fw.qtpl:200
+//line cmd/fw.qtpl:199
 	return qs422016
-//line cmd/fw.qtpl:200
+//line cmd/fw.qtpl:199
 }
