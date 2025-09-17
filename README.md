@@ -1,18 +1,15 @@
 # fw
 File Watcher
 
-This tool generates a go template file like [this](./watch/fw/fw.go) which can be run to watch and execute a command after any file update.
-
+This tool generates a go template file like [this](./cmd/fw/fw.go) which can be run as Go program to listen to file updates and execute operations.
 
 ## Why?
 
-There are many tools that would do the same job but they require learning and/or setting some configuration files or similar, so I decided to reinvent the wheel and to build one of my own.
+There are already many tools that would do the same job (examples [**air**](https://github.com/air-verse/air), [**task**](https://github.com/go-task/task)) but they require creating some configuration files.
 
-With the generated file it is possible to define the directories/files to watch and the commands to run on any file update.
+I really didn't want to read all their documentation, their settings etc... so I decided to ~~invest 1000X the time it would take me to use one of the tools above and~~ build my own tool with a template Go program that listen to file change events and run some operations.
 
-It uses [fsnotify](https://github.com/fsnotify/fsnotify).
-
-
+The other tools I mentioned above are also written in Go and use [fsnotify](https://github.com/fsnotify/fsnotify), which is just what is really needed for my needs.
 
 ## Installation
 
@@ -20,7 +17,7 @@ It uses [fsnotify](https://github.com/fsnotify/fsnotify).
 go install github.com/Jiang-Gianni/fw@latest
 ```
 
-and then run the following inside the desired directory:
+and then run the following inside the desired directory (requires a `go.mod` file -> a Go project):
 
 ```bash
 fw
@@ -35,54 +32,14 @@ To specify the destination directory and filename:
 fw -d myDir/mySubDir -f myWatcher.go
 ```
 
-After resolving the [fsnotify](https://github.com/fsnotify/fsnotify) dependency (`go mod tidy`), update `watch/fw/fw.go` and run:
+Update the generated file `watch/fw/fw.go` with what you need, resolve the dependencies with `go mod tidy` and just run the program.
 
-```bash
-go run watch/fw/fw.go
-```
-
-
-
-## How to setup
-
-### Example
-
-Inside the generated file, update the variable `fws` by adding a value for any filetype / directory / file to watch.
-
-In the generated template:
-
-```go
-	{
-		directories: []string{"./"},
-		files:       []string{"main.go"},
-		regexMatch:  ".go$",
-		ticker:      time.NewTicker(time.Second),
-		signal:      make(chan struct{}),
-		run:         GoWatch(),
-	},
-```
-
-will watch all the subdirectories and the `main.go` files. The function definede in the `run` field is executed when a `.go` file is updated (`regexMatch`) at a rate of maximum one per second (`ticker` field, the reason for this is that some code editors trigger multiple file updates at once).
-
-
-### Another example
-
-Another example: if you have tools like [sqlc](https://github.com/sqlc-dev/sqlc) installed, this file watcher tool can execute `sqlc generate` by adding the following to the `fws` list (adjust directories and files watch based on your repository):
-
-
-```go
-	{
-		directories: []string{"./sql"},
-		files:       []string{},
-		regexMatch:  ".sql$",
-		ticker:      time.NewTicker(time.Second),
-		signal:      make(chan struct{}),
-		run: func(filename string, fw *FW) {
-			log.Println("SQL file update: ", filename)
-			cmd := exec.Command("sqlc", "generate")
-			RunCmd(cmd, true)
-		},
-	},
-```
-
-This will generate/update the go files which in turn will trigger the go file watcher (if present).
+The generated Go template has some default example functions to live reloading/generating:
+- Go application
+- [sqlc](https://github.com/sqlc-dev/sqlc) (**sqlc** CLI tool needed)
+- [templ](https://github.com/a-h/templ) (**templ** CLI tool needed)
+- [esbuild](https://github.com/evanw/esbuild)
+- [brotli](https://github.com/andybalholm/brotli)
+- [buf](https://github.com/bufbuild/buf)
+- [markdown](https://github.com/yuin/goldmark)
+- [d2](https://github.com/terrastruct/d2) (**d2** CLI tool needed)
