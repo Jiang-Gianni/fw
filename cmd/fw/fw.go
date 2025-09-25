@@ -6,6 +6,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"image/png"
 	"io"
 	"log"
 	"net/http"
@@ -13,9 +14,11 @@ import (
 	"os/exec"
 	"regexp"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/andybalholm/brotli"
+	"github.com/chai2010/webp"
 	"github.com/evanw/esbuild/pkg/api"
 	"github.com/fsnotify/fsnotify"
 	"github.com/yuin/goldmark"
@@ -112,7 +115,39 @@ var fws = []*FW{
 		name:       "d2",
 		regexMatch: regexp.MustCompile(`/*.d2$`),
 		run: func(e fsnotify.Event) {
-			RunCmd(exec.Command("d2", e.Name, e.Name+".svg"))
+			RunCmd(exec.Command("d2", e.Name, e.Name+".png"))
+		},
+	},
+	{
+		// https://github.com/chai2010/webp
+		name:       "png to webp",
+		regexMatch: regexp.MustCompile(`/*.png$`),
+		run: func(e fsnotify.Event) {
+			inFile, err := os.Open(e.Name)
+			if err != nil {
+				log.Println("err: ", err)
+				return
+			}
+			defer inFile.Close()
+
+			img, err := png.Decode(inFile)
+			if err != nil {
+				log.Println("err: ", err)
+				return
+			}
+
+			outFile, err := os.Create(strings.TrimSuffix(e.Name, "png") + "webp")
+			if err != nil {
+				log.Println("err: ", err)
+				return
+			}
+			defer outFile.Close()
+
+			err = webp.Encode(outFile, img, &webp.Options{Quality: 80})
+			if err != nil {
+				log.Println("err: ", err)
+				return
+			}
 		},
 	},
 }

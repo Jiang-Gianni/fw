@@ -5,6 +5,7 @@ go 1.25.1
 require (
 	github.com/a-h/templ v0.3.943
 	github.com/andybalholm/brotli v1.2.0
+	github.com/chai2010/webp v1.4.0
 	github.com/evanw/esbuild v0.25.10
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/yuin/goldmark v1.7.13

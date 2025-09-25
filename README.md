@@ -43,3 +43,4 @@ The generated Go template has some default example functions to live reloading/g
 - [buf](https://github.com/bufbuild/buf)
 - [markdown](https://github.com/yuin/goldmark)
 - [d2](https://github.com/terrastruct/d2) (**d2** CLI tool needed)
+- [webp](https://github.com/chai2010/webp)
