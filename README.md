@@ -14,7 +14,7 @@ The other tools I mentioned above are also written in Go and use [fsnotify](http
 ## Installation
 
 ```bash
-go install github.com/Jiang-Gianni/fw@latest
+go install github.com/Jiang-Gianni/fw/cmd@latest
 ```
 
 and then run the following inside the desired directory (requires a `go.mod` file -> a Go project):
